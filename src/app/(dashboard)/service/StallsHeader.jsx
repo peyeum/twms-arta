@@ -6,7 +6,6 @@ import {
 import { useServiceContext } from './context'
 import StallItem from '@/components/services/StallItem'
 import TimeGuide from '@/components/services/TimeGuide'
-import { sortStalls } from '@/app/helper'
 
 export default function StallsHeader({ dataStalls, dataAllocations, children, ...rest}) {
   const { hourWidth, rowGap } = useServiceContext()
@@ -16,7 +15,6 @@ export default function StallsHeader({ dataStalls, dataAllocations, children, ..
     const allocations = dataAllocations.filter((allocation) => allocation.id_stall === stall.id_stall )
     return { ...stall, allocations }
   })
-  const sortedAllocations = sortStalls(stallsWithAllocations)
   return (
     <Flex
       {...rest}
@@ -33,8 +31,7 @@ export default function StallsHeader({ dataStalls, dataAllocations, children, ..
         <Text flexShrink='0' transform='rotate(-90deg)' >Stall</Text>
       </Flex>
       <Stack gap={rowGap + 'px'} pos='relative'>
-        {/* {stallsWithAllocations.map((stall) => ( */}
-        {sortedAllocations.map((stall) => (
+        {stallsWithAllocations.map((stall) => (
           <StallItem
             w={widthTolerance - rowGap + 'px'}
             key={stall.id_stall}

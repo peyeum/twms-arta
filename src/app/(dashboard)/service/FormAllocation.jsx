@@ -14,9 +14,10 @@ import {
 } from '@chakra-ui/react'
 import DatePickerCS from '@/components/DatePickerCS'
 import { AsyncCreatableSelect, AsyncSelect } from "chakra-react-select"
-import { customPickBy, formatTglWaktu, getOption, isEmptyObject, wait } from '@/app/helper'
+import { customPickBy, getOption, isEmptyObject, wait } from '@/app/helper'
 import { useForm, Controller } from "react-hook-form"
 import { useRouter } from 'next/navigation'
+import DatePickerSP from '@/components/DatePickerSP'
 
 export default function FormAllocation({ allocation, noContext }) {
 
@@ -25,6 +26,7 @@ export default function FormAllocation({ allocation, noContext }) {
     onClose,
     isAllocationFormOpen,
     handleAddCarActions,
+    setClientCarOptions,
     usersOptions,
     carsOptions,
     statusOptions,
@@ -56,12 +58,6 @@ export default function FormAllocation({ allocation, noContext }) {
 
   const router = useRouter()
   const defaultStatus = { value: 'onprogress', label: 'On Progress'}
-  const timeOption = {
-    hour: "numeric",
-    minute: "numeric",
-    hour12: false,
-    timeZone: 'Asia/Jakarta',
-  }
 
   const listIdTeknisi = teknisi?.map((teknisi) => teknisi.id_employee)
   const getTeknisi = (arrOfValue) => arrOfValue?.map((value) => getOption(value, teknisiOptions))
@@ -84,15 +80,9 @@ export default function FormAllocation({ allocation, noContext }) {
     defaultValues: {
       id_service: id_service ?? undefined,
       tgl_service: tgl_service ? new Date(tgl_service) : new Date(),
-      start_time: mulai
-        ? formatTglWaktu(new Date(mulai), timeOption)
-        : formatTglWaktu(new Date().toISOString(), timeOption),
-      estimated_time: estimasi_waktu
-        ? formatTglWaktu(new Date(estimasi_waktu), timeOption)
-        : '',
-      end_time: selesai
-        ? formatTglWaktu(new Date(selesai), timeOption)
-        : '',
+      start_time: mulai ? new Date(mulai) : new Date(),
+      estimated_time: estimasi_waktu ? new Date(estimasi_waktu) : undefined,
+      end_time: selesai ? new Date(selesai) : undefined,
       kilometer: kilometer ?? '',
       note: note ?? '',
       car: selectedCar ?? undefined,
@@ -123,18 +113,7 @@ export default function FormAllocation({ allocation, noContext }) {
 
       const res = await fetch(`/api/service/${id_service}`, {
         method: 'put',
-        body: JSON.stringify(
-          (
-            changedDataForm.hasOwnProperty('start_time') ||
-            changedDataForm.hasOwnProperty('estimated_time') ||
-            changedDataForm.hasOwnProperty('end_time')
-          )
-            ? {
-              ...changedDataForm,
-              tgl_service: dataForm.tgl_service
-            }
-            : changedDataForm
-        ),
+        body: JSON.stringify(changedDataForm),
       })
       const { data, error } = await res.json()
       if (error) {
@@ -183,6 +162,7 @@ export default function FormAllocation({ allocation, noContext }) {
   }
   const setCarInputValue = (data) => {
     setValue('car', data , { shouldValidate: true})
+    setClientCarOptions((prev) => [...prev, data])
   }
 
   const [isCarMenuOpen, setCarMenu] = useBoolean()
@@ -307,37 +287,89 @@ export default function FormAllocation({ allocation, noContext }) {
 
           <FormControl isInvalid={!!errors.start_time}>
             <FormLabel>Mulai</FormLabel>
-            <Input
-              type='time'
-              {...register('start_time',{
+            <Controller
+              name='start_time'
+              control={control}
+              rules={{
                 required: 'Tentukan waktu mulai service',
-              })}
-              w='32'
-              pattern='[0-9]{2}:[0-9]{2}'
+                pattern: /[0-9]{2}:[0-9]{2}/i,
+              }}
+              render={({field: { onChange, onBlur, value, ref }}) => (
+                <DatePickerSP
+                  type='time'
+                  w='20'
+                  maxDate={new Date()}
+                  dateFormat='HH:mm'
+                  timeFormat="HH:mm"
+                  timeIntervals={2}
+                  timeCaption="Jam"
+                  timeMin='08:00'
+                  timeMax='16:59'
+                  showTimeSelect
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  selected={value}
+                />
+              )}
             />
             <FormErrorMessage>{errors?.start_time?.message}</FormErrorMessage>
           </FormControl>
 
           <FormControl isInvalid={!!errors.estimated_time}>
             <FormLabel>Estimasi Selesai</FormLabel>
-            <Input
-              type='time'
-              w='32'
-              {...register('estimated_time',{
+            <Controller
+              name='estimated_time'
+              control={control}
+              rules={{
                 required: 'Tentukan estimasi waktu selesai service',
-              })}
-              pattern='[0-9]{2}:[0-9]{2}'
+                pattern: /[0-9]{2}:[0-9]{2}/i,
+              }}
+              render={({field: { onChange, onBlur, value, ref }}) => (
+                <DatePickerSP
+                  type='time'
+                  w='20'
+                  maxDate={new Date()}
+                  dateFormat='HH:mm'
+                  timeFormat="HH:mm"
+                  timeIntervals={2}
+                  timeCaption="Jam"
+                  timeMin='08:00'
+                  timeMax='16:59'
+                  showTimeSelect
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  selected={value}
+                />
+              )}
             />
             <FormErrorMessage>{errors?.estimated_time?.message}</FormErrorMessage>
           </FormControl>
 
           <FormControl>
             <FormLabel>Selesai</FormLabel>
-            <Input
-              type='time'
-              w='32'
-              {...register('end_time')}
-              pattern='[0-9]{2}:[0-9]{2}'
+            <Controller
+              name='end_time'
+              control={control}
+              rules={{
+                pattern: /[0-9]{2}:[0-9]{2}/i,
+              }}
+              render={({field: { onChange, onBlur, value, ref }}) => (
+                <DatePickerSP
+                  type='time'
+                  w='20'
+                  maxDate={new Date()}
+                  dateFormat='HH:mm'
+                  timeFormat="HH:mm"
+                  timeIntervals={2}
+                  timeCaption="Jam"
+                  timeMin='08:00'
+                  timeMax='16:59'
+                  showTimeSelect
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  selected={value}
+                />
+              )}
             />
           </FormControl>
 

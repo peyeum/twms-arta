@@ -68,7 +68,7 @@ export default async function RiwayatService() {
   const dataAllocations = await getAllAllocationsComprehen({
     stallOptions,
     carsOptions,
-    statusOptions,
+    statusOptions: BOOKING_STATUS_OPTIONS,
   })
   return (
     <RiwayatClient

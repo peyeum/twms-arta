@@ -133,7 +133,7 @@ export default async function RiwayatService() {
     stallOptions,
     usersOptions,
     carsOptions,
-    statusOptions,
+    SERVICE_STATUS_OPTIONS,
   })
   return (
     <RiwayatClient

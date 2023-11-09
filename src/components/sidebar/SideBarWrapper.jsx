@@ -61,7 +61,7 @@ export default function SideBarWrapper({
         </Button>
       </Tooltip>
       <Account navsize={navsize} username={username} role={role} />
-      <SidebarContent navsize={navsize} activeIndex={activeIndex} />
+      <SidebarContent navsize={navsize} activeIndex={activeIndex} role={role} />
       <LogoutComp navsize={navsize} />
     </Flex>
   )

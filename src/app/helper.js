@@ -7,20 +7,20 @@ const getTimeFromISOStringDate = (ISOStringDate) => {
   return `${hour}:${minute}`
 }
 
-const getMultipliers = ( start_time, end_time ) => {
+const getMultipliers = (start_time, end_time) => {
   const startTime = start_time.map(s => parseInt(s))
   const endTime = end_time.map(e => parseInt(e))
 
   const hour = [8, 9, 10, 11, 12, 13, 14, 15, 16]
   const getMinuteMultipiler = (minute) => {
     const minutes = [0, 15, 30, 45]
-    if (minute < minutes[1] ) return 0
-    if (minute >= minutes[1] && minute < minutes[2] ) return 1
-    if (minute >= minutes[2] && minute < minutes[3] ) return 2
+    if (minute < minutes[1]) return 0
+    if (minute >= minutes[1] && minute < minutes[2]) return 1
+    if (minute >= minutes[2] && minute < minutes[3]) return 2
     if (minute >= minutes[3] && minute < 60) return 3
     return minute
   }
-  
+
   const startHourMultipiler = hour.findIndex(h => h === startTime[0])
   const startMinuteMultipiler = getMinuteMultipiler(startTime[1])
   const endHourMultipiler = hour.findIndex(h => h === endTime[0])
@@ -32,23 +32,23 @@ const getMultipliers = ( start_time, end_time ) => {
   }
 }
 
-export const calcAlocation = ({ startTime, endTime, }) =>{  
+export const calcAlocation = ({ startTime, endTime, }) => {
   const start = (getTimeFromISOStringDate(startTime)).split(':').slice(0, 2)
   const end = (getTimeFromISOStringDate(endTime)).split(':').slice(0, 2)
-  
-  const [ startHours ] = start
-  const [ endHours ] = end
+
+  const [startHours] = start
+  const [endHours] = end
   const MIN_START_HOUR = 8
   const MAX_END_HOUR = 16
   const MIN_START_TIME = ['8', '0']
   const MAX_END_TIME = ['16', '59']
-  
+
   const hourBase = 11.11 // in percentage
   const minuteBase = 2.7775 // in percentage
   const layoutTolerance = 0.5 // in percentage
   const marginTolerance = 0.5 // in px
   const wideTolerance = 1.5 // in px
-  
+
   const {
     startMultipiler,
     endMultipiler,
@@ -83,7 +83,7 @@ export const calcBookingAllocation = (appointment) => {
   const startTime = appointment
   const endTime = new Date(endAppointment).toISOString()
 
-  return calcAlocation({ startTime, endTime})
+  return calcAlocation({ startTime, endTime })
 }
 
 export const getTimeGuidePosition = () => {
@@ -101,7 +101,7 @@ export const getTimeGuidePosition = () => {
 }
 
 export const formatTglWaktu = (dateStr, option) => {
-  const date = new Date(dateStr)  
+  const date = new Date(dateStr)
   return new Intl.DateTimeFormat('en-UK', option).format(date)
 }
 
@@ -136,9 +136,9 @@ export const isDate = (input) => (Object.prototype.toString.call(input) === "[ob
 
 export const getSubTitleDate = (rentang, date) => {
   const headerDate = Intl
-    .DateTimeFormat('id-ID',{ dateStyle: 'long', timeZone: 'Asia/Jakarta',})
+    .DateTimeFormat('id-ID', { dateStyle: 'long', timeZone: 'Asia/Jakarta', })
     .format(date)
-  
+
   const subTitle = rentang === 'bulanan'
     ? 'Bulan ' + headerDate.slice(2)
     : 'Tanggal ' + headerDate
@@ -146,9 +146,9 @@ export const getSubTitleDate = (rentang, date) => {
 }
 
 export const subFirstTwoWords = (str) => {
-  const [ first, second, third ] = str.split(' ');
-  if (first.toLowerCase() === 'honda') return `${second} ${third}`
-  return `${first} ${second}`
+  const [first, second, third] = str.split(' ');
+  if (first.toLowerCase() === 'honda') return `${second} ${third ?? ''}`
+  return `${first} ${second ?? ''}`
 }
 
 export const wait = async (time) => new Promise((resolve) => setTimeout(resolve, time))
@@ -156,9 +156,9 @@ export const wait = async (time) => new Promise((resolve) => setTimeout(resolve,
 export const customPickBy = (object, predicate) => {
   const result = {};
   for (const key in object) {
-      if (object.hasOwnProperty(key) && predicate(object[key], key)) {
-          result[key] = object[key];
-      }
+    if (object.hasOwnProperty(key) && predicate(object[key], key)) {
+      result[key] = object[key];
+    }
   }
   return result;
 }
@@ -172,9 +172,9 @@ export const formatNumberWithLeadingZeros = (number, width) => {
   const leadingZerosCount = width - numStr.length;
 
   if (leadingZerosCount > 0) {
-      return '0'.repeat(leadingZerosCount) + numStr;
+    return '0'.repeat(leadingZerosCount) + numStr;
   } else {
-      return numStr;
+    return numStr;
   }
 }
 
@@ -213,7 +213,7 @@ export const sortStalls = (data) => {
  */
 export const calculateAverage = (array) => {
   if (array.length === 0) {
-      return 0
+    return 0
   }
   const sum = array.reduce((accumulator, currentValue) => accumulator + currentValue, 0)
   return Math.floor((sum / array.length), 0)
@@ -253,8 +253,8 @@ export const findMostFrequentElement = (array) => {
     }
   }
   return mostFrequentElement === null
-    ? [ 'tidak ada data' ]
-    : [ mostFrequentElement, maxCount + ' unit' ]
+    ? ['tidak ada data']
+    : [mostFrequentElement, maxCount + ' unit']
 }
 
 
@@ -265,7 +265,16 @@ export const findMostFrequentElement = (array) => {
  * @param {Array<number>} scores - An array of scores for overall, qs, pm, and gr.
  * @returns {Object} The summary object with category name and scores.
  */
-export const createCategorySummary = ( category, [ overall, qs, pm, gr ] ) => ({
+export const createCategorySummary = (category, [overall, qs, pm, gr]) => ({
   category, overall, qs, pm, gr
 })
 
+
+export const validateConditions = (conditions) => {
+  for (const { condition, message } of conditions) {
+    if (condition) {
+      return { error: message }
+    }
+  }
+  return { error: null }
+}

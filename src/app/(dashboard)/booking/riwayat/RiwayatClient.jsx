@@ -26,13 +26,13 @@ export default function RiwayatClient({
 
   const handleAddActions = () => {
     setAllocation({})
-    setTitle('Tambah Data Alokasi')
+    setTitle('Tambah Data Booking')
     onOpen()
   }
 
   const handleEditActions = (data) => {
     onOpen()
-    setTitle('Edit Data Alokasi')
+    setTitle('Edit Data Booking')
     setAllocation(data)
   }
 

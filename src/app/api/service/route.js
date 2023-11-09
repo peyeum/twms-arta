@@ -1,7 +1,7 @@
 import { CAR_MODEL_LIST, HARIAN_TABLE_HEADER } from "@/app/consts"
-import { calculateAverage, convertTimeToISOString, createCategorySummary, findMostFrequentElement, getMaxValue, getMinValue } from "@/app/helper"
+import { calculateAverage, createCategorySummary, findMostFrequentElement, getMaxValue, getMinValue, validateConditions } from "@/app/helper"
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
-import { add, formatISO, isBefore } from "date-fns"
+import { add, formatISO, isBefore, isValid } from "date-fns"
 import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 
@@ -175,44 +175,64 @@ const handleHarainReport = (data) =>  {
 
 export async function POST(request) {
   const body = await request.json()
+  const notExists = { value: undefined }
   const {
     id_booking,
     tgl_service,
     start_time,
     estimated_time,
     end_time,
-    car: { value: id_mobil },
-    stall: { value: id_stall },
-    status: { value: status },
-    service_advisor: { value: service_advisor },
-    foreman: { value: foreman },
+    car: { value: id_mobil } = notExists,
+    stall: { value: id_stall } = notExists,
+    status: { value: status } = notExists,
+    service_advisor: { value: service_advisor } = notExists,
+    foreman: { value: foreman } = notExists,
     teknisi,
     kilometer,
     note,
   } = body
+
+  const conditions = [
+    { condition: !tgl_service  || !isValid(new Date(tgl_service)), message: 'Tanggal service tidak valid' },
+    { condition: !start_time  || !isValid(new Date(start_time)), message: 'Waktu mulai tidak valid' },
+    { condition: !estimated_time  || !isValid(new Date(estimated_time)), message: 'Waktu estimasi selesai tidak valid' },
+    { condition: (status === 'finished' && !end_time) || (end_time && !isValid(new Date(end_time))), message: 'Waktu selesai tidak valid' },
+    { condition: end_time && status !== 'finished', message: 'Status masih belum Selesai' },
+    { condition: !id_mobil, message: 'Mobil tidak valid' },
+    { condition: !id_stall, message: 'Stall tidak valid' },
+    { condition: !status, message: 'Status tidak valid' },
+    { condition: !service_advisor, message: 'Service Advisor tidak valid' },
+    { condition: !foreman, message: 'Foreman tidak valid' },
+    { condition: !teknisi || !Array.isArray(teknisi) || teknisi.length === 0, message: 'Teknisi tidak valid' },
+    { condition: teknisi.length > 2, message: 'Maksimal 2 teknisi' },
+    { condition: isBefore(new Date(estimated_time), new Date(start_time)), message: 'Waktu estimasi selesai tidak valid' },
+    { condition: end_time && (isBefore(new Date(end_time), new Date(start_time))), message: 'Waktu selesai tidak valid' },
+  ]
+  
+  const { error } = validateConditions(conditions)
+  if (error) return NextResponse.json({ data: null, error })
+
   const supabase = createRouteHandlerClient({ cookies })
-
-  const startTimeIso = convertTimeToISOString(start_time, tgl_service) ?? null
-  const estimatedTimeIso = convertTimeToISOString(estimated_time, tgl_service) ?? null
-  const endTimeIso = convertTimeToISOString(end_time, tgl_service) ?? null
-
-  const { data: [ dataService ], error: errorService } = await supabase.from('service')
+  const { data: dataService, error: errorService } = await supabase.from('service')
     .insert({
       // id_booking,
       id_mobil,
       id_stall,
       status,
       tgl_service,
-      kilometer,
+      kilometer: kilometer === '' ? undefined : Number(kilometer),
       note,
-      mulai: startTimeIso,
-      estimasi_waktu: estimatedTimeIso,
-      selesai: endTimeIso,
+      mulai: start_time,
+      estimasi_waktu: estimated_time,
+      selesai: end_time === '' ? undefined : end_time,
       service_advisor,
       foreman,
     })
     .select()
-  
+    .single()
+
+  if (errorService) return NextResponse.json({ data: null, error: errorService.message })
+
   const teknisiService = teknisi?.map((entry) => ({
     id_service: dataService?.id_service,
     id_employee: entry?.value,
@@ -222,13 +242,15 @@ export async function POST(request) {
     .from('service_detail_teknisi')
     .insert(teknisiService)
     .select('id_employee')
+  
+  if (errorListTeknisi) return NextResponse.json({ data: null, error: errorListTeknisi.message })
 
   return NextResponse.json({
-    data: !(errorService ?? errorListTeknisi) ? {
+    data: {
       ...dataService,
       teknisi: listTeknisiService,
       message: 'Data berhasil ditambahkan'
-    } : undefined,
-    error: errorService?.message ?? errorListTeknisi?.message
+    },
+    error: null,
   })
 }

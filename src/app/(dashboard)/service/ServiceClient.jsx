@@ -23,6 +23,7 @@ import DatePickerCS from '@/components/DatePickerCS'
 import { format, isSameDay } from 'date-fns'
 import DangerAlert from '@/components/DangerAlert'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import tryFetch from '@/lib/tryFetch'
 
 export default function ServiceClient({
   usersOptions,
@@ -38,6 +39,7 @@ export default function ServiceClient({
   const [platnopol, setPlatnopol] = useState('')
   const [carValueCallbackSetter, setCarValueCallbackSetter] = useState()
   const [allocations, setAllocations] = useState(dataAllocations)
+  const [clientCarOptions, setClientCarOptions] = useState(carsOptions)
   const [serviceDate, setServiceDate] = useState(new Date())
   const { isOpen, onOpen, onClose } = useDisclosure()
   const supabase = createClientComponentClient()
@@ -87,6 +89,7 @@ export default function ServiceClient({
     onCarFormOpen()
     setPlatnopol(nopol)
     setCarValueCallbackSetter(() => inputSetter)
+    // refreshCarOptions()
   }
 
   const handleAllocationChange = async ({ eventType, new: newAllocation, old,  }) => {
@@ -160,9 +163,10 @@ export default function ServiceClient({
       onCarFormClose,
       platnopol,
       carValueCallbackSetter,
+      setClientCarOptions,
       currentAllocation,
       usersOptions,
-      carsOptions,
+      carsOptions: clientCarOptions,
       stallOptions,
       statusOptions,
     }}>

@@ -21,7 +21,7 @@ import DatePickerCS from '@/components/DatePickerCS'
 import DangerAlert from '@/components/DangerAlert'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { BookingContext } from './context'
-import { addDays, format, getHours, isSameDay, isSameHour } from 'date-fns'
+import { addDays, format, getHours, isSameDay } from 'date-fns'
 import { FiBook, FiPlus } from 'react-icons/fi'
 
 const TODAY_LIMIT_BOOKING_HOUR = 15
@@ -42,6 +42,7 @@ export default function BookingClient({
   const [currentAllocation, setCurrentAllocation] = useState({})
   const [platnopol, setPlatnopol] = useState('')
   const [carValueCallbackSetter, setCarValueCallbackSetter] = useState()
+  const [clientCarOptions, setClientCarOptions] = useState(carsOptions)
   const [bookingDate, setBookingDate] = useState(
     getHours(new Date()) >= TODAY_LIMIT_BOOKING_HOUR ? tomorrow : new Date()
   )
@@ -160,18 +161,20 @@ export default function BookingClient({
       platnopol,
       currentAllocation,
       usersOptions,
-      carsOptions,
+      // carsOptions,
+      carsOptions: clientCarOptions,
+      setClientCarOptions,
       stallOptions,
       statusOptions,
     }}>
       <Box ref={boxRef} overflow='hidden' >
         <Flex align='center' justify='' gap='1'>
           <Tooltip
-            label='Tambah Alokasi Service'
+            label='Tambah Alokasi Booking'
           >
             <IconButton
               icon={< FiPlus />}
-              aria-label='Tambah Alokasi Service'
+              aria-label='Tambah Alokasi Booking'
               onClick={handleAddActions}
               bg='blue.400'
               color='gray.100'
@@ -251,7 +254,7 @@ export default function BookingClient({
         </Stack>
       </Box>
       <ModalForm
-        modalTitle='Form Alokasi Service'
+        modalTitle='Form Alokasi Booking'
         isOpen={isAllocationFormOpen}
         onClose={onAllocationFormClose}
       >

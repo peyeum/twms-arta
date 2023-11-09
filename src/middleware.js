@@ -10,13 +10,14 @@ const ALLOWED_PATH = [
 export const config = {
   // matcher: '/((?!api|auth|_next|static|public|favicon.ico).*)',
   matcher: '/((?!api|auth|_next|assets|images|static|public|favicon.ico).*)',
+  // matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 }
 
 export async function middleware(req) {
 
   const requestHeaders = new Headers(req.headers)
   requestHeaders.set('x-url', req.url)
-  
+
   const res = NextResponse.next({
     request: {
       headers: requestHeaders,

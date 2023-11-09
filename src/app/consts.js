@@ -49,3 +49,11 @@ export const BOOKING_STATUS_OPTIONS = [
     label:'Belum Datang',
   },
 ]
+
+export const APP_ROUTES = {
+  '/': 'Dasbor',
+  '/master': 'Master Data',
+  '/service': 'Service',
+  '/booking': 'Booking',
+  '/laporan': 'Laporan Service',
+}

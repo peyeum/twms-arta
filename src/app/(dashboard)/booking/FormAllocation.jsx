@@ -12,12 +12,12 @@ import {
   useBoolean,
   useToast,
 } from '@chakra-ui/react'
-import DatePickerCS from '@/components/DatePickerCS'
 import { AsyncCreatableSelect, AsyncSelect } from "chakra-react-select"
-import { customPickBy, formatTglWaktu, isDate, isEmptyObject, wait } from '@/app/helper'
+import { customPickBy, isEmptyObject, wait } from '@/app/helper'
 import { useRouter } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { addDays } from 'date-fns'
+import DatePickerSP from '@/components/DatePickerSP'
 
 export default function FormAllocation({ allocation, noContext }) {
 
@@ -28,6 +28,7 @@ export default function FormAllocation({ allocation, noContext }) {
     carsOptions,
     statusOptions,
     stallOptions,
+    setClientCarOptions,
     // isAllocationFormOpen,
     // usersOptions,
   } = noContext ?? useBookingContext()
@@ -43,12 +44,6 @@ export default function FormAllocation({ allocation, noContext }) {
 
   const router = useRouter()
   const defaultStatus = { value: 'waiting', label: 'Belum Datang'}
-  const timeOption = {
-    hour: "numeric",
-    minute: "numeric",
-    hour12: false,
-    timeZone: 'Asia/Jakarta',
-  }
 
   const selectedCar = carsOptions.find((item) => item.value === id_mobil)
   const selectedStatus = statusOptions.find((item) => item.value === status)
@@ -141,6 +136,7 @@ export default function FormAllocation({ allocation, noContext }) {
   }
   const setCarInputValue = (data) => {
     setValue('car', data , { shouldValidate: true})
+    setClientCarOptions((prev) => [...prev, data])
   }
 
   const [isCarMenuOpen, setCarMenu] = useBoolean()
@@ -210,16 +206,19 @@ export default function FormAllocation({ allocation, noContext }) {
               required: 'Tentukan tanggal dan waktu booking',
             }}
             render={({field: { onChange, onBlur, value, ref }}) => (
-              <Input
+              <DatePickerSP
                 type='date'
                 maxDate={addDays(new Date(),1)}
-                dateFormat='dd/MM/yyyy hh:mm'
-                timeInputLabel='Jam : '
-                showTimeInput
+                dateFormat='dd/MM/yyyy - HH:mm'
+                timeFormat="HH:mm"
+                timeIntervals={15}
+                timeCaption="Jam"
+                timeMin='08:00'
+                timeMax='16:59'
+                showTimeSelect
                 onChange={onChange}
                 onBlur={onBlur}
                 selected={value}
-                as={DatePickerCS}
               />
             )}
           />
