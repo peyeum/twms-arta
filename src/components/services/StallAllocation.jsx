@@ -20,16 +20,9 @@ import { calcAlocation, formatTglWaktu, getOptionLabel, isISODateString, subFirs
 import TableActionCell from "../TableActionCell"
 import { useEffect } from "react"
 import { ServiceContext, useServiceContext } from "@/app/(dashboard)/service/context"
+import { SERVICE_STATUS_COLORS } from "@/app/consts"
 
-const statusColor = {
-  'onprogress': 'green.500, green.400',
-  'finished': 'gray.800, gray.900',
-  'wash': 'purple.600, purple.500',
-  'spooring': 'yellow.500, yellow.400',
-  'enginedressing': 'cyan.500, cyan.400',
-  'homeservice': 'blue.500, blue.400',
-  'waiting': 'red.600, red.500',
-}
+const statusColor = SERVICE_STATUS_COLORS
 
 export default function StallAllocation({ data, dataCount, children, ...rest }) {
   const { onOpen, onClose, isOpen } = useDisclosure()

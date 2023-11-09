@@ -18,12 +18,12 @@ import StallsHeader from './StallsHeader'
 import { ServiceContext } from './context'
 import ModalForm from '@/components/ModalForm'
 import FormAllocation from './FormAllocation'
-import FormMobil from './FormMobil'
-import DatePickerCS from '@/components/DatePickerCS'
-import { format, isSameDay } from 'date-fns'
 import DangerAlert from '@/components/DangerAlert'
+import DatePickerCS from '@/components/DatePickerCS'
+import FormMobil from './FormMobil'
+import { format, isSameDay } from 'date-fns'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import tryFetch from '@/lib/tryFetch'
+import StatusColorGuide from '@/components/services/StatusColorGuide'
 
 export default function ServiceClient({
   usersOptions,
@@ -89,7 +89,6 @@ export default function ServiceClient({
     onCarFormOpen()
     setPlatnopol(nopol)
     setCarValueCallbackSetter(() => inputSetter)
-    // refreshCarOptions()
   }
 
   const handleAllocationChange = async ({ eventType, new: newAllocation, old,  }) => {
@@ -194,7 +193,6 @@ export default function ServiceClient({
       onCarFormClose,
       platnopol,
       carValueCallbackSetter,
-      // setClientCarOptions,
       currentAllocation,
       usersOptions,
       carsOptions: clientCarOptions,
@@ -286,6 +284,7 @@ export default function ServiceClient({
             dataAllocations={allocations}
           />
         </Stack>
+        <StatusColorGuide />
       </Box>
       <ModalForm
         modalTitle='Form Alokasi Service'

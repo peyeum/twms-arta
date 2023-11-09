@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React from 'react'
 import { useBookingContext } from './context'
 import {
   Button,
@@ -28,9 +28,6 @@ export default function FormAllocation({ allocation, noContext }) {
     carsOptions,
     statusOptions,
     stallOptions,
-    setClientCarOptions,
-    // isAllocationFormOpen,
-    // usersOptions,
   } = noContext ?? useBookingContext()
 
   const {
@@ -136,7 +133,6 @@ export default function FormAllocation({ allocation, noContext }) {
   }
   const setCarInputValue = (data) => {
     setValue('car', data , { shouldValidate: true})
-    // setClientCarOptions((prev) => [...prev, data])
   }
 
   const [isCarMenuOpen, setCarMenu] = useBoolean()

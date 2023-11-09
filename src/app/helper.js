@@ -223,7 +223,7 @@ export const getMaxValue = (array) => {
   if (!Array.isArray(array) || array.length === 0) {
     return 0
   }
-  return Math.max(...array)
+  return Math.floor(Math.max(...array), 0)
 }
 
 export const getMinValue = (array) => {

@@ -13,20 +13,18 @@ import {
   useToast,
 } from '@chakra-ui/react'
 import DatePickerCS from '@/components/DatePickerCS'
+import DatePickerSP from '@/components/DatePickerSP'
 import { AsyncCreatableSelect, AsyncSelect } from "chakra-react-select"
 import { customPickBy, getOption, isEmptyObject, wait } from '@/app/helper'
 import { useForm, Controller } from "react-hook-form"
 import { useRouter } from 'next/navigation'
-import DatePickerSP from '@/components/DatePickerSP'
 
 export default function FormAllocation({ allocation, noContext }) {
 
   const {
     onAllocationFormClose,
     onClose,
-    isAllocationFormOpen,
     handleAddCarActions,
-    setClientCarOptions,
     usersOptions,
     carsOptions,
     statusOptions,
@@ -162,7 +160,6 @@ export default function FormAllocation({ allocation, noContext }) {
   }
   const setCarInputValue = (data) => {
     setValue('car', data , { shouldValidate: true})
-    // setClientCarOptions((prev) => [...prev, data])
   }
 
   const [isCarMenuOpen, setCarMenu] = useBoolean()

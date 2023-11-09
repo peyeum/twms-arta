@@ -192,9 +192,7 @@ export default function BookingClient({
       platnopol,
       currentAllocation,
       usersOptions,
-      // carsOptions,
       carsOptions: clientCarOptions,
-      // setClientCarOptions,
       stallOptions,
       statusOptions,
     }}>
