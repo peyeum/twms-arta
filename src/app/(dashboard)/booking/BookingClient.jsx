@@ -126,12 +126,43 @@ export default function BookingClient({
     }
   }
 
+  const handleCarChange = async ({ eventType, new: newCar, old,  }) => {
+  
+    const newCarOptions = {
+      value: newCar?.id_mobil,
+      label: newCar?.nopol,
+    } ?? undefined
+
+    switch (eventType) {
+      case 'INSERT': {
+        return setClientCarOptions((oldCars) => [...oldCars, newCarOptions])
+      }
+      case 'UPDATE': {
+        return setClientCarOptions((oldCars) => oldCars
+          .map((car) => {
+            if (car.value === newCarOptions?.value) return newCarOptions
+            return car
+          }))
+      }
+      case 'DELETE': {
+        return setClientCarOptions((oldCars) => oldCars
+          .filter((car) => car.value !== old.id_mobil))
+      }
+      default: {
+        return null
+      }
+    }
+  }
+
   useEffect(() => {
     const bookingChannel = supabase
       .channel('booking allocations')
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'bookings' },
         handleAllocationChange)
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'cars' },
+        handleCarChange)
       .subscribe()
 
     return () => supabase.removeChannel(bookingChannel)
@@ -163,7 +194,7 @@ export default function BookingClient({
       usersOptions,
       // carsOptions,
       carsOptions: clientCarOptions,
-      setClientCarOptions,
+      // setClientCarOptions,
       stallOptions,
       statusOptions,
     }}>

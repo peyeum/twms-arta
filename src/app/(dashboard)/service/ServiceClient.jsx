@@ -123,6 +123,34 @@ export default function ServiceClient({
     }
   }
 
+  const handleCarChange = async ({ eventType, new: newCar, old,  }) => {
+  
+    const newCarOptions = {
+      value: newCar?.id_mobil,
+      label: newCar?.nopol,
+    } ?? undefined
+
+    switch (eventType) {
+      case 'INSERT': {
+        return setClientCarOptions((oldCars) => [...oldCars, newCarOptions])
+      }
+      case 'UPDATE': {
+        return setClientCarOptions((oldCars) => oldCars
+          .map((car) => {
+            if (car.value === newCarOptions?.value) return newCarOptions
+            return car
+          }))
+      }
+      case 'DELETE': {
+        return setClientCarOptions((oldCars) => oldCars
+          .filter((car) => car.value !== old.id_mobil))
+      }
+      default: {
+        return null
+      }
+    }
+  }
+
   useEffect(() => {
     const seviceChannel = supabase
       .channel('service allocations')
@@ -135,6 +163,9 @@ export default function ServiceClient({
       .on('postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'service_detail_teknisi' },
       handleAllocationChange)
+      .on('postgres_changes',
+      { event: '*', schema: 'public', table: 'cars' },
+      handleCarChange)
       .subscribe()
 
     return () => supabase.removeChannel(seviceChannel)
@@ -163,7 +194,7 @@ export default function ServiceClient({
       onCarFormClose,
       platnopol,
       carValueCallbackSetter,
-      setClientCarOptions,
+      // setClientCarOptions,
       currentAllocation,
       usersOptions,
       carsOptions: clientCarOptions,

@@ -136,7 +136,7 @@ export default function FormAllocation({ allocation, noContext }) {
   }
   const setCarInputValue = (data) => {
     setValue('car', data , { shouldValidate: true})
-    setClientCarOptions((prev) => [...prev, data])
+    // setClientCarOptions((prev) => [...prev, data])
   }
 
   const [isCarMenuOpen, setCarMenu] = useBoolean()
