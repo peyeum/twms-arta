@@ -90,43 +90,31 @@ export async function PUT(request, { params }) {
     const conditions = [
       { condition: estimated_time && (isBefore(new Date(estimated_time), startTime)), message: 'Waktu estimasi selesai tidak valid' },
       { condition: end_time && end_time !== '' && (isBefore(new Date(end_time), startTime)), message: 'Waktu selesai tidak valid' },
-      { condition: end_time && end_time !== '' && status !== 'finished' || !status, message: 'Status masih belum Selesai' },
+      { condition: end_time && end_time !== '' && status !== 'finished', message: 'Status masih belum Selesai' },
     ]
 
     const { error: validationError } = validateConditions(conditions)
     if (validationError) return NextResponse.json({ data: null, error: validationError })
   }
 
-  if (
-    id_booking ||
-    id_mobil ||
-    id_stall ||
-    status ||
-    kilometer ||
-    note ||
-    service_advisor ||
-    foreman ||
-    tgl_service
-  ) {
-    const { error } = await supabase.from('service')
-      .update({
-        ...(id_booking && { id_booking }),
-        ...(id_mobil && { id_mobil }),
-        ...(id_stall && { id_stall }),
-        ...(status && { status }),
-        ...(kilometer !== '' && { kilometer: Number(kilometer) }),
-        ...(note && { note }),
-        ...(service_advisor && { service_advisor }),
-        ...(foreman && { foreman }),
-        ...(tgl_service && { tgl_service }),
-        ...(start_time && { mulai: start_time }),
-        ...(estimated_time && { estimasi_waktu: estimated_time }),
-        ...(end_time && { selesai: end_time }),
-      })
-      .eq('id_service', id_service)
+  const { error: errorUpdate } = await supabase.from('service')
+    .update({
+      ...(id_booking && { id_booking }),
+      ...(id_mobil && { id_mobil }),
+      ...(id_stall && { id_stall }),
+      ...(status && { status }),
+      ...(kilometer !== '' && { kilometer: Number(kilometer) }),
+      ...(note && { note }),
+      ...(service_advisor && { service_advisor }),
+      ...(foreman && { foreman }),
+      ...(tgl_service && { tgl_service }),
+      ...(start_time && { mulai: start_time }),
+      ...(estimated_time && { estimasi_waktu: estimated_time }),
+      ...(end_time && { selesai: end_time }),
+    })
+    .eq('id_service', id_service)
 
-    if (error) return NextResponse.json({ data: null, error: error.message })
-  }
+  if (errorUpdate) return NextResponse.json({ data: null, error: errorUpdate.message })
 
   if (teknisi?.length > 0) {
     const { error: errorDelete } = await supabase.from('service_detail_teknisi')
