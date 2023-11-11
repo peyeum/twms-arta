@@ -78,19 +78,21 @@ export async function PUT(request, { params }) {
 
   const supabase = createRouteHandlerClient({ cookies })
   if (estimated_time || end_time) {
-    const { data: { mulai }, error: errorStartTime } = await supabase.from('service')
-      .select('mulai')
+    const { data: { mulai = undefined, status: oldStatus = undefined } = {}, error: errorStartTime } = await supabase.from('service')
+      .select('mulai, status')
       .eq('id_service', id_service)
       .single()
 
     if (errorStartTime) return NextResponse.json({ data: null, error: errorStartTime.message })
 
     const startTime = new Date(mulai)
-
+    const currentStatus = status ?? oldStatus
     const conditions = [
+      { condition: !mulai, message: 'Kesalahan, Waktu mulai tidak ditemukan' },
+      { condition: !currentStatus, message: 'Kesalahan, Status tidak ditemukan' },
       { condition: estimated_time && (isBefore(new Date(estimated_time), startTime)), message: 'Waktu estimasi selesai tidak valid' },
       { condition: end_time && end_time !== '' && (isBefore(new Date(end_time), startTime)), message: 'Waktu selesai tidak valid' },
-      { condition: end_time && end_time !== '' && status !== 'finished', message: 'Status masih belum Selesai' },
+      { condition: end_time && end_time !== '' && currentStatus !== 'finished', message: 'Status masih belum Selesai' },
     ]
 
     const { error: validationError } = validateConditions(conditions)
